@@ -1,34 +1,37 @@
-#!C:\Users\Lenovo\AppData\Local\Programs\Python\Python37-32\python.exe
-
 import numpy as np
 import pandas as pd
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 import warnings
-import pickle
+
 warnings.filterwarnings("ignore")
 
+# Load the dataset
 data = pd.read_csv("Forest_fire.csv")
-data = np.array(data)
 
-X = data[1:, 1:-1]
-y = data[1:, -1]
-y = y.astype('int')
-X = X.astype('int')
-# print(X,y)
+# Convert the DataFrame to numpy array
+data = data.to_numpy()
+
+# Split the features and target variable
+X = data[1:, 1:-1].astype(int)
+y = data[1:, -1].astype(int)
+
+# Split the dataset into training and testing sets
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=0)
+
+# Create and train the logistic regression model
 log_reg = LogisticRegression()
-
-
 log_reg.fit(X_train, y_train)
 
-inputt=[int(x) for x in "45 32 60".split(' ')]
-final=[np.array(inputt)]
+# Save the trained model using joblib
+from joblib import dump
+dump(log_reg, 'model.pkl')
 
-b = log_reg.predict_proba(final)
+# Example: Load the model and make predictions
+from joblib import load
+model = load('model.pkl')
 
-
-pickle.dump(log_reg,open('model.pkl','wb'))
-model=pickle.load(open('model.pkl','rb'))
-
-
+# Example: Make predictions
+inputt = np.array([[45, 32, 60]])  # Example input for prediction
+prediction = model.predict_proba(inputt)
+print(prediction)
